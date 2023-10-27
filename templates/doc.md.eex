@@ -1,0 +1,5 @@
+<img src="<%= api["icons"]["x32"] %>" />
+<%= api["description"] %>
+
+- **API Documentation**: [<%= api["documentationLink"] %>](<%= api["documentationLink"] %>)
+- **Discovery URL**: [<%= api["discoveryRestUrl"] %>](<%= api["discoveryRestUrl"] %>)
