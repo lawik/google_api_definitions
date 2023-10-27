@@ -19,9 +19,9 @@ defmodule GoogleApiDefinitions.Docs do
   end
 
   defp to_page({id, api}) do
-    dir = :code.priv_dir(:google_api_definitions)
-    path = Path.join([dir, "pages", "#{id}.md"])
-    File.mkdir_p!(Path.dirname(path))
+    dir = Path.join(File.cwd!(), "priv/pages")
+    path = Path.join(dir, "#{id}.md")
+    File.mkdir_p!(dir)
     File.write!(path, to_md(api))
     {Path.relative_to_cwd(path), title: "#{api["title"]} #{api["version"]}"}
   end

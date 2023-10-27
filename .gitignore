@@ -27,3 +27,4 @@ google_api_descriptions-*.tar
 extra_pages.term
 priv/discovery.json
 priv/definitions/*.json
+priv/pages
