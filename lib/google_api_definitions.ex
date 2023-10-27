@@ -1,6 +1,6 @@
 defmodule GoogleApiDefinitions do
   @discovery_url "https://discovery.googleapis.com/discovery/v1/apis"
-  @discovery_file "discovery.json"
+  @discovery_file "discovery.json.gz"
   @definitions_dir "definitions"
 
   require Logger
@@ -14,7 +14,8 @@ defmodule GoogleApiDefinitions do
   def list_discovered do
     discovered =
       discovery_path!()
-      |> File.read!()
+      |> File.stream!([:compressed])
+      |> Enum.into(<<>>)
       |> Jason.decode!()
 
     discovered["items"]
@@ -27,7 +28,8 @@ defmodule GoogleApiDefinitions do
   def list_discovered_full do
     discovered =
       discovery_path!()
-      |> File.read!()
+      |> File.stream!([:compressed])
+      |> Enum.into(<<>>)
       |> Jason.decode!()
 
     discovered["items"]
@@ -79,7 +81,7 @@ defmodule GoogleApiDefinitions do
   end
 
   defp definition_path(id) do
-    Path.join(definitions_dir(), "#{id}.json")
+    Path.join(definitions_dir(), "#{id}.json.gz")
   end
 
   defp start_finch do
@@ -103,7 +105,7 @@ defmodule GoogleApiDefinitions do
         |> Path.dirname()
         |> File.mkdir_p!()
 
-        File.write(filepath, response.body)
+        File.write(filepath, response.body, [:compressed])
 
       err ->
         err
