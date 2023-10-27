@@ -25,3 +25,5 @@ google_api_descriptions-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 extra_pages.term
+priv/discovery.json
+priv/definitions/*.json

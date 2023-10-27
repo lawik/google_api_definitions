@@ -15,5 +15,7 @@ defmodule Mix.Tasks.GoogleApiDefinitions.UpdateDefinitions do
     list_discovered()
     |> Map.keys()
     |> fetch_definitions()
+
+    copy_from_internal_to_cwd_priv!()
   end
 end

@@ -42,15 +42,30 @@ defmodule GoogleApiDefinitions do
 
     list_discovered_full()
     |> Map.take(ids)
-    |> Task.async_stream(fn {id, disco} ->
-      Logger.info(
-        "Fetching #{disco["title"]} (#{disco["version"]}) from #{disco["discoveryRestUrl"]}..."
-      )
+    |> Task.async_stream(
+      fn {id, disco} ->
+        Logger.info(
+          "Fetching #{disco["title"]} (#{disco["version"]}) from #{disco["discoveryRestUrl"]}..."
+        )
 
-      fetch_to_file(disco["discoveryRestUrl"], definition_path(id))
-      Logger.info("Written to #{definition_path(id)}.")
-    end)
+        fetch_to_file(disco["discoveryRestUrl"], definition_path(id))
+        Logger.info("Written to #{definition_path(id)}.")
+      end,
+      timeout: 30_000
+    )
     |> Enum.to_list()
+  end
+
+  def copy_from_internal_to_cwd_priv! do
+    from_disco = discovery_path!()
+    to_disco = Path.join([File.cwd!(), "priv", @discovery_file])
+    Logger.info("Copying #{from_disco} to #{to_disco}.")
+    File.cp!(from_disco, to_disco)
+
+    from_defs = definitions_dir()
+    to_defs = Path.join([File.cwd!(), "priv", @definitions_dir])
+    Logger.info("Copying recursively #{from_defs} to #{to_defs}.")
+    File.cp_r!(from_defs, to_defs)
   end
 
   defp discovery_path! do
