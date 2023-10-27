@@ -8,14 +8,14 @@ defmodule GoogleApiDefinitions do
   def fetch_discovery do
     start_finch()
     path = discovery_path!()
-    fetch_to_file(@discovery_url, path)
+    :ok = fetch_to_file(@discovery_url, path)
   end
 
   def list_discovered do
     discovered =
       discovery_path!()
-      |> File.stream!([:compressed])
-      |> Enum.into(<<>>)
+      |> File.read!()
+      |> :zlib.gunzip()
       |> Jason.decode!()
 
     discovered["items"]
@@ -28,8 +28,8 @@ defmodule GoogleApiDefinitions do
   def list_discovered_full do
     discovered =
       discovery_path!()
-      |> File.stream!([:compressed])
-      |> Enum.into(<<>>)
+      |> File.read!()
+      |> :zlib.gunzip()
       |> Jason.decode!()
 
     discovered["items"]
@@ -56,18 +56,6 @@ defmodule GoogleApiDefinitions do
       timeout: 30_000
     )
     |> Enum.to_list()
-  end
-
-  def copy_from_internal_to_cwd_priv! do
-    from_disco = discovery_path!()
-    to_disco = Path.join([File.cwd!(), "priv", @discovery_file])
-    Logger.info("Copying #{from_disco} to #{to_disco}.")
-    File.cp!(from_disco, to_disco)
-
-    from_defs = definitions_dir()
-    to_defs = Path.join([File.cwd!(), "priv", @definitions_dir])
-    Logger.info("Copying recursively #{from_defs} to #{to_defs}.")
-    File.cp_r!(from_defs, to_defs)
   end
 
   defp discovery_path! do
@@ -105,7 +93,7 @@ defmodule GoogleApiDefinitions do
         |> Path.dirname()
         |> File.mkdir_p!()
 
-        File.write(filepath, response.body, [:compressed])
+        File.write(filepath, :zlib.gzip(response.body))
 
       err ->
         err
